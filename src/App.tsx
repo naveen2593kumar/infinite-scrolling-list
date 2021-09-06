@@ -1,24 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
+import { useState } from 'react';
+import { Switch } from 'react-router-dom';
+
+import ProtectedRoute from './components/commons/ProtectedRoute';
+import Header from './components/header/Header';
+import UserProvider from './contexts/user.context';
+import { IUser } from './model/user.interface';
+import HomePage from './pages/home/HomePage';
+import LoginPage from './pages/login/LoginPage';
 import './App.css';
 
 function App() {
+  const [user, setUser] = useState<IUser>();
+  const isAuthenticated = !!user && user.isAuthenticated;
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <UserProvider value={{ user, setUser }}>
+        <Header />
+        <Switch>
+          <ProtectedRoute exact path="/login" component={LoginPage} />
+          <ProtectedRoute exact path="/home" component={HomePage} />
+          <ProtectedRoute path="/" component={isAuthenticated ? HomePage : LoginPage} />
+        </Switch>
+      </UserProvider>
     </div>
   );
 }
